@@ -7,6 +7,11 @@ spring.cloud.gateway.routes:
       - Path=/movie-service/**
     filters:
       - RewritePath=/movie-service/(?<segment>.*), /$\{segment}
+      - name: CircuitBreaker
+        args:
+          name: movieCircuitBreaker
+          fallbackUri: forward:/movies/fallback
+
 
   - id: goal-api
     uri: http://localhost:9000/
@@ -42,6 +47,10 @@ spring.cloud.gateway.routes:
       - Path=/tidbits-service/**
     filters:
       - RewritePath=/tidbits-service/(?<segment>.*), /$\{segment}
+      - name: CircuitBreaker
+        args:
+          name: triviaCircuitBreaker
+          fallbackUri: forward:/trivia/fallback
 
   - id: dashboard-api
     uri: http://localhost:9060/
@@ -49,12 +58,14 @@ spring.cloud.gateway.routes:
       - Path=/dashboard-service/**
     filters:
       - RewritePath=/dashboard-service/(?<segment>.*), /$\{segment}
+
   - id: user-api
     uri: http://localhost:9070/
     predicates:
       - Path=/user-service/**
     filters:
       - RewritePath=/user-service/(?<segment>.*), /$\{segment}
+
 
 spring:
   security:

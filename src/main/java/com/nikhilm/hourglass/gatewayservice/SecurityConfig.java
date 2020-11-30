@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
@@ -30,7 +31,7 @@ public class SecurityConfig {
 				.pathMatchers("/user-service/user/**").permitAll()
 				.pathMatchers("/movie-service/**").permitAll()
 				.pathMatchers("/tidbits-service/**").permitAll()
-				.pathMatchers("/favourites-service/**").permitAll()
+				.pathMatchers(HttpMethod.GET, "/favourites-service/**/user/**").permitAll()
 				.anyExchange().authenticated()
 				.and()
 				.oauth2ResourceServer()
