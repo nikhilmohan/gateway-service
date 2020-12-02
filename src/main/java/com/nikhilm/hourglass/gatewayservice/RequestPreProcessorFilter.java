@@ -27,9 +27,11 @@ public class RequestPreProcessorFilter implements GlobalFilter {
         String originalUri = (uris.isEmpty()) ? "Unknown" : uris.iterator().next().toString();
         Route route = exchange.getAttribute(GATEWAY_ROUTE_ATTR);
         URI routeUri = exchange.getAttribute(GATEWAY_REQUEST_URL_ATTR);
-        log.info("Incoming request " + originalUri + " is routed to id: " + route.getId()
-                + ", uri:" + routeUri);
 
+        if (null != route) {
+            log.info("Incoming request " + originalUri + " is routed to id: " + route.getId()
+                    + ", uri:" + routeUri);
+        }
         return exchange.getPrincipal().flatMap(principal -> {
             log.info("principal " + principal.getName());
             //exchange.getRequest().getHeaders().add("user", principal.getName());
