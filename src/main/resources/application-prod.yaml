@@ -1,0 +1,78 @@
+server.port: 9900
+spring.cloud.gateway.routes:
+
+  - id: movie-api
+    uri: http://localhost:9030/
+    predicates:
+      - Path=/movie-service/**
+    filters:
+      - RewritePath=/movie-service/(?<segment>.*), /$\{segment}
+      - name: CircuitBreaker
+        args:
+          name: movieCircuitBreaker
+          fallbackUri: forward:/movies/fallback
+
+
+  - id: goal-api
+    uri: http://localhost:9000/
+    predicates:
+      - Path=/goal-service/**
+    filters:
+      - RewritePath=/goal-service/(?<segment>.*), /$\{segment}
+
+  - id: task-api
+    uri: http://localhost:9010/
+    predicates:
+      - Path=/task-service/**
+    filters:
+      - RewritePath=/task-service/(?<segment>.*), /$\{segment}
+
+  - id: movie-factory-api
+    uri: http://movie-factory:9020/
+    predicates:
+      - Path=/movie-factory-service/**
+    filters:
+      - RewritePath=/movie-factory-service/(?<segment>.*), /$\{segment}
+
+  - id: favourites-api
+    uri: http://favourites-service:9040/
+    predicates:
+      - Path=/favourites-service/**
+    filters:
+      - RewritePath=/favourites-service/(?<segment>.*), /$\{segment}
+
+  - id: tidbits-api
+    uri: http://localhost:9050/
+    predicates:
+      - Path=/tidbits-service/**
+    filters:
+      - RewritePath=/tidbits-service/(?<segment>.*), /$\{segment}
+      - name: CircuitBreaker
+        args:
+          name: triviaCircuitBreaker
+          fallbackUri: forward:/trivia/fallback
+
+  - id: dashboard-api
+    uri: http://dashboard-service:9060/
+    predicates:
+      - Path=/dashboard-service/**
+    filters:
+      - RewritePath=/dashboard-service/(?<segment>.*), /$\{segment}
+
+  - id: user-api
+    uri: http://user-service:9070/
+    predicates:
+      - Path=/user-service/**
+    filters:
+      - RewritePath=/user-service/(?<segment>.*), /$\{segment}
+
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com
+          issuer-uri: https://securetoken.google.com/hourglass-app-2e376
+
+
