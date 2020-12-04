@@ -2,7 +2,7 @@ server.port: 9900
 spring.cloud.gateway.routes:
 
   - id: movie-api
-    uri: http://localhost:9030/
+    uri: http://movie-picker-service:9030/
     predicates:
       - Path=/movie-service/**
     filters:
@@ -14,14 +14,14 @@ spring.cloud.gateway.routes:
 
 
   - id: goal-api
-    uri: http://localhost:9000/
+    uri: http://goal-service:9000/
     predicates:
       - Path=/goal-service/**
     filters:
       - RewritePath=/goal-service/(?<segment>.*), /$\{segment}
 
   - id: task-api
-    uri: http://localhost:9010/
+    uri: http://task-service:9010/
     predicates:
       - Path=/task-service/**
     filters:
@@ -42,7 +42,7 @@ spring.cloud.gateway.routes:
       - RewritePath=/favourites-service/(?<segment>.*), /$\{segment}
 
   - id: tidbits-api
-    uri: http://localhost:9050/
+    uri: http://tidbits-service:9050/
     predicates:
       - Path=/tidbits-service/**
     filters:
