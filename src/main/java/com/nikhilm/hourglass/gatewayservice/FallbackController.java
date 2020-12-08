@@ -35,6 +35,13 @@ public class FallbackController {
         return ResponseBuilder.buildDashboardResponse();
 
     }
+    @GetMapping("/user-service/user/fallback")
+    public String dummy() {
+        log.info("In gateway !");
+
+        return "dummy response!";
+
+    }
 
 
 
