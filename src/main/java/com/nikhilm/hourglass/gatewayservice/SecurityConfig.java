@@ -31,6 +31,7 @@ public class SecurityConfig {
 				.pathMatchers("/user-service/user/**").permitAll()
 				.pathMatchers("/movie-service/**").permitAll()
 				.pathMatchers("/tidbits-service/**").permitAll()
+				.pathMatchers("/userservice/**").permitAll()
 				.pathMatchers(HttpMethod.GET, "/favourites-service/**/user/**").permitAll()
 				.anyExchange().authenticated()
 				.and()
