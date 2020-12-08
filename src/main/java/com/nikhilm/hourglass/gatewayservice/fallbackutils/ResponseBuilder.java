@@ -1,9 +1,11 @@
 package com.nikhilm.hourglass.gatewayservice.fallbackutils;
 
 import com.nikhilm.hourglass.gatewayservice.response.*;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Arrays;
 
+@Slf4j
 public class ResponseBuilder {
 
     public static MovieFallbackResponse buildMovieResponse() {
@@ -20,6 +22,7 @@ public class ResponseBuilder {
                         "A young white man who spent his whole life raised by Native Americans is sent to live with his birth family and must learn to fit in with people he was taught to hate.",
                         "https://m.media-amazon.com/images/M/MV5BMGE5YjY5ZjYtZTRkOC00Y2MzLThjZjQtODJhNzcwYzVhMDA1XkEyXkFqcGdeQXVyMTE2NzA0Ng@@._V1_SX300.jpg",
                         "520", true, "Unrated", "83 min", "6.5", false)));
+        log.info("Response " + response.getMovies().size() +  " " + response.getMovies().get(0).getTitle());
         return response;
     }
 
