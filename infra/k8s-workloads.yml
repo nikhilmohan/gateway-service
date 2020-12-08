@@ -1,0 +1,164 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway-service-deploy
+spec:
+  selector:
+    matchLabels:
+      app: gateway-service
+  replicas: 1
+  template: # template for the pods
+    metadata:
+      labels:
+        app: gateway-service
+    spec:
+      containers:
+        - name: gateway-service
+          image: nikmohan81/gateway-service:latest
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: prod
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway-service
+
+spec:
+  # This defines which pods are going to be represented by this Service
+  # The service becomes a network endpoint for either other services
+  # or maybe external users to connect to (eg browser)
+  selector:
+    app: gateway-service
+
+  ports:
+    - name: http
+      port: 9900
+
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongo-pvc
+spec:
+  storageClassName: cloud-ssd
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+# How do we want it implemented
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: cloud-ssd
+provisioner: kubernetes.io/aws-ebs
+parameters:
+  type: gp2
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hourglassdb-deploy
+spec:
+  selector:
+    matchLabels:
+      app: hourglassdb
+  replicas: 1
+  template: # template for the pods
+    metadata:
+      labels:
+        app: hourglassdb
+    spec:
+      containers:
+        - name: hourglassdb
+          image: mongo:latest
+          volumeMounts:
+            - name: mongo-persistent-storage
+              mountPath: /data/db
+      volumes:
+        - name: mongo-persistent-storage
+          # pointer to the configuration of HOW we want the mount to be implemented
+          persistentVolumeClaim:
+            claimName: mongo-pvc
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: hourglassdb-service
+spec:
+  selector:
+    app: hourglassdb
+  ports:
+    - name: mongoport
+      port: 27017
+  type: ClusterIP
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rabbitmq
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+    spec:
+      containers:
+        - name: rabbitmq
+          image: rabbitmq:3.7.8-management
+          ports:
+            - containerPort: 5671
+            - containerPort: 5672
+            - containerPort: 15672
+          resources:
+            limits:
+              memory: 350Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq
+spec:
+  selector:
+    app: rabbitmq
+  ports:
+    - name: tcp-secure
+      port: 5671
+    - name: tcp-not-secure
+      port: 5672
+    - name: http-mgm-ui
+      port: 15672
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway-service
+
+spec:
+  # This defines which pods are going to be represented by this Service
+  # The service becomes a network endpoint for either other services
+  # or maybe external users to connect to (eg browser)
+  selector:
+    app: gateway-service
+
+  ports:
+    - name: http
+      port: 9900
+
+  type: ClusterIP
+
+
