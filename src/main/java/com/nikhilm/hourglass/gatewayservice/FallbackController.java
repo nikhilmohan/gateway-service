@@ -14,6 +14,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Slf4j
 public class FallbackController {
+
+    @GetMapping("/health")
+    public String health()  {
+        return "ok";
+    }
+
     @GetMapping("/movies/fallback")
     public MovieFallbackResponse movieFallbackHandler() {
         log.info("In gateway fallback!");

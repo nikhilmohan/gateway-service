@@ -26,6 +26,8 @@ public class SecurityConfig {
 		http
 			.csrf().disable()
 			.authorizeExchange()
+				.pathMatchers("/health").permitAll()
+				.pathMatchers("/swagger/**").permitAll()
 				.pathMatchers("/user-service/signup").permitAll()
 				.pathMatchers("/user-service/login").permitAll()
 				.pathMatchers("/user-service/user/**").permitAll()
