@@ -4,4 +4,4 @@ EXPOSE 9020
 
 ADD ./target/*.jar app.jar
 
-ENTRYPOINT ["java","-jar","/app.jar"]
+ENTRYPOINT ["java","-Xmx50m","-jar","/app.jar"]

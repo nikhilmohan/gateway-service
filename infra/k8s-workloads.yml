@@ -26,6 +26,11 @@ spec:
               port: 9900
             initialDelaySeconds: 3
             periodSeconds: 3
+          resources:
+            requests:
+              memory: 200Mi
+              cpu: 0.1
+
 
 
 ---
