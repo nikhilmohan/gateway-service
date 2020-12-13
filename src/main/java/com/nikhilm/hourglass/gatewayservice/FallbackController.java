@@ -3,12 +3,9 @@ package com.nikhilm.hourglass.gatewayservice;
 import com.nikhilm.hourglass.gatewayservice.fallbackutils.ResponseBuilder;
 import com.nikhilm.hourglass.gatewayservice.response.*;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.gateway.support.ServerWebExchangeUtils;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
+
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
