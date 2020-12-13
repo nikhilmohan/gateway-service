@@ -20,6 +20,12 @@ spec:
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: prod
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 9900
+            initialDelaySeconds: 3
+            periodSeconds: 3
 
 
 ---
