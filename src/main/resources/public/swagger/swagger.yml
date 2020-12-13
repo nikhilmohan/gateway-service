@@ -1,0 +1,892 @@
+openapi: 3.0.1
+info:
+  title: Hourglass API Gateway
+  description: API Gateway for microservices in hourglass application
+  contact:
+    name: Nikhil Mohan
+    email: nikmohan81@gmail.com
+  version: "1.0"
+servers:
+  - url: http://gateway-service:9900
+    description: Generated server url
+paths:
+  /goal:
+    put:
+      tags:
+        - goal-resource
+      summary: Update goal status
+      operationId: updateGoalStatus
+      parameters:
+        - name: user
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GoalDTO'
+      responses:
+        "200":
+          description: Updated the goal
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GoalResponse'
+        "404":
+          description: Goal not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+    post:
+      tags:
+        - goal-resource
+      summary: Add goal for the user
+      operationId: addGoal
+      parameters:
+        - name: user
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GoalDTO'
+      responses:
+        "201":
+          description: Created the goal
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Goal'
+        "409":
+          description: Goal already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /goals:
+    get:
+      tags:
+        - goal-resource
+      summary: List all goals for the user
+      operationId: goals
+      parameters:
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: user
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        "200":
+          description: Found the goals
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GoalResponse'
+  /task/add:
+    post:
+      tags:
+        - task-handler
+      summary: Add a new task for the user
+      operationId: addTask
+      requestBody:
+        description: Task to add
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Task'
+        required: true
+      responses:
+        "201":
+          description: Task created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMap'
+        "409":
+          description: Task already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMap'
+  /task/complete:
+    post:
+      tags:
+        - task-handler
+      summary: Complete the task
+      operationId: completeTask
+      requestBody:
+        description: Task to complete
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Task'
+        required: true
+      responses:
+        "204":
+          description: Task completed
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMap'
+        "404":
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMap'
+  /tasks:
+    get:
+      tags:
+        - task-handler
+      summary: Fetch all tasks for the user
+      operationId: getTasks
+      responses:
+        "200":
+          description: list of tasks
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMap'
+
+  /movies:
+    get:
+      tags:
+        - movie-resource
+      summary: Fetch movie recommendations for the day
+      operationId: getMovies
+      parameters:
+        - name: user
+          in: header
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of movies
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MovieResponse'
+  /favourites/user/{userId}/movies:
+    get:
+      tags:
+        - favourite-resource
+      summary: Fetch all favourite movies for the user
+      operationId: getFavouriteMovies
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: ids
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "403":
+          description: Forbidden access
+        "404":
+          description: Favourite list not found
+        "200":
+          description: List of movie favourites
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FavouriteMoviesResponse'
+  /favourites/user/{userId}/trivia:
+    get:
+      tags:
+        - favourite-resource
+      summary: Fetch all favourite trivia for the user
+      operationId: getFavouriteTrivia
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: terms
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "403":
+          description: Forbidden access
+        "404":
+          description: favourite list not found
+        "200":
+          description: List of trivia favourites
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FavouriteTriviaResponse'
+    put:
+      tags:
+        - favourite-resource
+      summary: Change the favourite status of a trivia (add/ remove)
+      operationId: updateTriviaAsFavourite
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: user
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TriviaDTO'
+      responses:
+        "404":
+          description: favourite resource for user not found
+        "403":
+          description: Forbidden access
+        "200":
+          description: Success - Trivia favourite status updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Movie'
+  /favourites/user/{userId}/movie:
+    put:
+      tags:
+        - favourite-resource
+      summary: Change the favourite status of a movie (add/ remove)
+      operationId: updateMovieAsFavourite
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: user
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Movie'
+      responses:
+        "404":
+          description: favourite resource for user not found
+        "403":
+          description: Forbidden access
+        "200":
+          description: Success - Movie favourite status updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Movie'
+  /favourites:
+    get:
+      tags:
+        - favourite-resource
+      summary: Fetch all favourites for the user
+      operationId: getFavourites
+      parameters:
+        - name: user
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of movie and trivia favourites
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FavouritesResponse'
+    post:
+      tags:
+        - favourite-resource
+      summary: Create favourite list for the user
+      operationId: createFavouriteMovieList
+      parameters:
+        - name: user
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Favourite list initialized
+  /tidbits:
+    get:
+      tags:
+        - tidbits-resource
+      summary: Fetch tidbits recommendations for the day
+      operationId: getTidbits
+      parameters:
+        - name: user
+          in: header
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: list of trivia
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tidbits'
+  /metrics:
+    get:
+      tags:
+        - dashboard-resource
+      summary: List all goal/ task metrics for the user
+      operationId: getMetrics
+      parameters:
+        - name: user
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        "200":
+          description: Metrics data received for user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetricResponse'
+  /metrics/{userId}:
+    post:
+      tags:
+        - dashboard-resource
+      summary: Initialize metrics resource for user
+      operationId: initMetrics
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: user
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        "403":
+          description: Forbidden access
+        "200":
+          description: Metrics resource initialized
+  /signup:
+    post:
+      tags:
+        - user-resource
+      summary: Signup a new user
+      operationId: signUpUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCred'
+      responses:
+        "200":
+          description: New user signed up
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDTO'
+        "400":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /login:
+    post:
+      tags:
+        - user-resource
+      summary: User login
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCred'
+      responses:
+        "200":
+          description: User login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDTO'
+        "400":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /user/{userId}/status:
+    get:
+      tags:
+        - user-resource
+      summary: Get user login status - true if user is logged in
+      operationId: getUserStatus
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: boolean
+  /logout:
+    post:
+      tags:
+        - user-resource
+      summary: User logout
+      operationId: logout
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDTO'
+      responses:
+        "200":
+          description: User logout successful
+        "404":
+          description: No session found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+components:
+  schemas:
+    GoalDTO:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        notes:
+          type: array
+          items:
+            type: string
+        level:
+          type: string
+          enum:
+            - EASY
+            - MODERATE
+            - EXTREME
+        completedOn:
+          type: string
+          format: date
+        status:
+          type: string
+          enum:
+            - ACTIVE
+            - DEFERRED
+            - COMPLETED
+        dueDate:
+          type: string
+          format: date
+        votes:
+          type: integer
+          format: int32
+    Goal:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        notes:
+          type: array
+          items:
+            type: string
+        level:
+          type: string
+          enum:
+            - EASY
+            - MODERATE
+            - EXTREME
+        completedOn:
+          type: string
+          format: date
+        status:
+          type: string
+          enum:
+            - ACTIVE
+            - DEFERRED
+            - COMPLETED
+        dueDate:
+          type: string
+          format: date
+        votes:
+          type: integer
+          format: int32
+    ApiError:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+    GoalResponse:
+      type: object
+      properties:
+        goals:
+          type: array
+          items:
+            $ref: '#/components/schemas/Goal'
+        totalgoals:
+          type: integer
+          format: int64
+    Task:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        dueDate:
+          type: string
+          format: date
+    ErrorMap:
+      type: object
+      properties:
+        status:
+          type: string
+        message:
+          type: string
+        exception:
+          type: string
+        error:
+          type: string
+    TaskResponse:
+      type: object
+      properties:
+        tasks:
+          type: array
+          items:
+            $ref: '#/components/schemas/Task'
+        totalTasks:
+          type: integer
+          format: int64
+    Movie:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        year:
+          type: string
+        genre:
+          type: string
+        plot:
+          type: string
+        poster:
+          type: string
+        imdbVotes:
+          type: string
+        used:
+          type: boolean
+        certification:
+          type: string
+        runningTime:
+          type: string
+        ratings:
+          type: string
+        favourite:
+          type: boolean
+    MovieResponse:
+      type: object
+      properties:
+        movies:
+          type: array
+          items:
+            $ref: '#/components/schemas/Movie'
+        feedDate:
+          type: string
+          format: date
+        favouritesEnabled:
+          type: boolean
+    FavouriteMoviesResponse:
+      type: object
+      properties:
+        userId:
+          type: string
+        favouriteMovies:
+          type: array
+          items:
+            $ref: '#/components/schemas/MovieShort'
+    MovieShort:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        poster:
+          type: string
+    FavouriteTriviaResponse:
+      type: object
+      properties:
+        userId:
+          type: string
+        favouriteTrivia:
+          type: array
+          items:
+            $ref: '#/components/schemas/Trivia'
+    Trivia:
+      type: object
+      properties:
+        id:
+          type: string
+        term:
+          type: string
+        fact:
+          type: string
+        category:
+          type: string
+    TriviaDTO:
+      type: object
+      properties:
+        id:
+          type: string
+        term:
+          type: string
+        fact:
+          type: string
+        category:
+          type: string
+    FavouritesResponse:
+      type: object
+      properties:
+        userId:
+          type: string
+        favouriteMovies:
+          type: array
+          items:
+            $ref: '#/components/schemas/Movie'
+        favouriteTrivia:
+          type: array
+          items:
+            $ref: '#/components/schemas/Trivia'
+    Tidbits:
+      type: object
+      properties:
+        triviaList:
+          type: array
+          items:
+            $ref: '#/components/schemas/TriviaShort'
+        feedDate:
+          type: string
+          format: date
+        favouritesEnabled:
+          type: boolean
+    TriviaShort:
+      type: object
+      properties:
+        term:
+          type: string
+        fact:
+          type: string
+        category:
+          type: string
+          enum:
+            - science
+            - technology
+            - sport
+            - travel
+        favourite:
+          type: boolean
+    GoalTrend:
+      type: object
+      properties:
+        key:
+          type: string
+        value:
+          type: integer
+          format: int64
+    MetricResponse:
+      type: object
+      properties:
+        goalScore:
+          type: integer
+          format: int64
+        averageScore:
+          type: number
+          format: double
+        totalGoalsCompleted:
+          type: integer
+          format: int64
+        totalGoalsInProgress:
+          type: integer
+          format: int64
+        totalGoalsDeferred:
+          type: integer
+          format: int64
+        goalsCompletedOnTime:
+          type: integer
+          format: int64
+        goalsCompletedAfterTime:
+          type: integer
+          format: int64
+        easyGoalsCompleted:
+          type: integer
+          format: int64
+        moderateGoalsCompleted:
+          type: integer
+          format: int64
+        extremeGoalsCompleted:
+          type: integer
+          format: int64
+        goalsPlanned:
+          type: integer
+          format: int64
+        goalsAccomplished:
+          type: integer
+          format: int64
+        tasksPlanned:
+          type: integer
+          format: int64
+        tasksCompleted:
+          type: integer
+          format: int64
+        trends:
+          type: array
+          items:
+            $ref: '#/components/schemas/GoalTrend'
+        activeMonth:
+          type: string
+          format: date
+        fallback:
+          type: string
+    UserCred:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+        returnSecureToken:
+          type: boolean
+    UserDTO:
+      type: object
+      properties:
+        idToken:
+          type: string
+        email:
+          type: string
+        refreshToken:
+          type: string
+        expiresIn:
+          type: string
+        localId:
+          type: string
+
+
+
